@@ -1,208 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <title>Application de Suivi de Budget</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
-    <div id="accueil" class="accueil">
-        <div class="row">
-            <div class="col-md-12">
-                <img src="logo.png" alt="logo">
+    <div id="auth-container">
+        <form id="login-form">
+            <div class="container d-flex justify-content-center">
+                <div class="d-flex flex-column justify-content-between">
+                    <div class="card mt-3 p-5">
+                        <div class="logo mb-3 w-100"><img style="width: 30%;" src="logo/logo.png"></div>
+                            <div>
+                                <p class="mb-1" style="color: #81a969;">Commencez à gérer vos</p>
+                                <h4 class="mb-5 text-green">courses avec nous!</h4>
+                            </div>
+                            <button class="btn btn-lg" id="show-signup" style="background-color: #68902b;"><small>Pas de compte ?</small><span>&nbsp;S'inscrire</span>
+                            </button>
+                    </div>
+                    <div class="card two bg-white px-5 py-4 mb-3">
+                        <div class="form-group"><input type="email" class="form-control"id="login-email" required><label class="form-control-placeholder" for="mail">Email</label></div>
+                        <div class="form-group"><input type="password" class="form-control" id="login-password" required><label class="form-control-placeholder" for="password">Mot de passe</label></div>
+                        <button class="btn btn-block btn-lg mt-1 mb-2" style="background-color: #68902b;"><span>Démarrer<i class="fas fa-long-arrow-alt-right ml-2"></i></span></button>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <button id="show-login" class="btn btn-primary">Connecter</button>
-                <button id="show-signup" class="btn btn-primary">S'inscrire</button>
+            
+        </form>
+        <form id="signup-form" style="display: none;">
+            <div class="container d-flex justify-content-center">
+                <div class="d-flex flex-column justify-content-between">
+                    <div class="card mt-3 p-5">
+                        <div class="logo mb-3 w-100"><img style="width: 30%;" src="logo/logo.png"></div>
+                            <div>
+                                <p class="mb-1" style="color: #81a969;">Commencez à gérer vos</p>
+                                <h4 class="mb-5 text-green">courses avec nous!</h4>
+                            </div>
+                            <button class="btn btn-lg" id="show-login" style="background-color: #68902b;"><small>Déjà inscrit ?</small><span>&nbsp;Se connecter</span>
+                            </button>
+                    </div>
+                    <div class="card two bg-white px-5 py-4 mb-3">
+                        <div class="form-group"><input type="text" class="form-control" id="signup-prenom" required><label class="form-control-placeholder" for="mail">Prénom</label></div>
+                        <div class="form-group"><input type="text" class="form-control" id="signup-nom" required><label class="form-control-placeholder" for="mail">Nom</label></div>
+                        <div class="form-group"><input type="tel" class="form-control" id="signup-telephone" required><label class="form-control-placeholder" for="mail">Téléphone</label></div>
+                        <div class="form-group"><input type="email" class="form-control" id="signup-email" required><label class="form-control-placeholder" for="mail">Email</label></div>
+                        <div class="form-group"><input type="password" class="form-control" id="signup-password" required><label class="form-control-placeholder" for="password">Mot de passe</label></div>
+                        <button class="btn btn-block btn-lg mt-1 mb-2" style="background-color: #68902b;"><span>S'inscrire<i class="fas fa-long-arrow-alt-right ml-2"></i></span></button>
+                    </div>
+                </div>
             </div>
-        </div>
+       
+        </form>
     </div>
-
-    <!-- menu -->
-    <nav id="nav-bar" class="nav-bar d-flex" style="display: none;">
-        <img src="logo.png" style="width: 100px;" alt="samay courses">
-        <div class="dropdown">
-            <button class="btn mt-3 btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Meblo Barham
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#" id="logout-btn">Deconnexion</a></li>            
-            </ul>
-          </div>
-    </nav>
-    <!-- fin menu -->
-
-    <!-- Connexion -->
-    <form id="login-form" style="display: none;">
-        <div id="login" class="container d-flex justify-content-center">
-            <div class="d-flex flex-column justify-content-between">
-                <div class="card mt-3 p-5">
-                    <div class="logo mb-3 w-100"><img style="width: 30%;" src="logo.png"></div>
-                        <div>
-                            <p class="mb-1">Commencez à gérer vos</p>
-                            <h4 class="mb-5 text-green">courses avec nous!</h4>
-                        </div>
-                        <button class="btn btn-primary btn-lg"><small>Déjà inscrit ?</small><span>&nbsp;Se connecter</span>
-                        </button>
-                </div>
-                <div class="card two bg-white px-5 py-4 mb-3">
-                    <div class="form-group"><input type="text" class="form-control" id="login-email" required><label class="form-control-placeholder" for="login-email">Email</label></div>
-                    <div class="form-group"><input type="password" class="form-control" id="login-password" required><label class="form-control-placeholder" for="login-password">Mot de passe</label></div>
-                    <button type="submit" class="btn btn-primary btn-block btn-lg mt-1 mb-2"><span>Se connecter<i class="fas fa-long-arrow-alt-right ml-2"></i></span></button>
+    <div id="main-container" style="display: none;">
+        <nav>
+            <img src="logo/logo.png" alt="Photo de profil" class="profile-pic">
+            <div class="dropdown">
+                <button class="dropbtn" id="user-name"></button>
+                <div class="dropdown-content">
+                    <a href="#" id="logout">Déconnexion</a>
                 </div>
             </div>
-        </div>
-    </form>
-    <!-- fin connexion -->
-
-    <!-- inscription -->
-    <form id="signup-form" style="display: none;">
-        <div id="signup" class="container d-flex justify-content-center">
-            <div class="d-flex flex-column justify-content-between">
-                <div class="card mt-3 p-5">
-                    <div class="logo mb-3 w-100"><img style="width: 30%;" src="logo.png"></div>
-                        <div>
-                            <p class="mb-1">Commencez à gérer vos</p>
-                            <h4 class="mb-5 text-green">courses avec nous!</h4>
-                        </div>
-                        <button class="btn btn-primary btn-lg"><small>Pas de compte ?</small><span>&nbsp;S'inscrire</span>
-                        </button>
-                </div>
-                <div class="card two bg-white px-5 py-4 mb-3">
-                    <div class="form-group"><input type="text" class="form-control" id="nom" required><label class="form-control-placeholder" for="nom">Nom complet</label></div>
-                    <div class="form-group"><input type="text" class="form-control" id="telephone" required><label class="form-control-placeholder" for="telephone">Téléphone</label></div>
-                    <div class="form-group"><input type="email" class="form-control" id="signup-email" required><label class="form-control-placeholder" for="signup-email">Email</label></div>
-                    <div class="form-group"><input type="password" class="form-control" id="signup-password" required><label class="form-control-placeholder" for="signup-password">Mot de passe</label></div>
-                    <button type="submit" class="btn btn-primary btn-block btn-lg mt-1 mb-2"><span>S'inscrire<i class="fas fa-long-arrow-alt-right ml-2"></i></span></button>
-                </div>
-            </div>
-        </div>
-    </form>
-    <!-- fin inscription -->
-
-    <!-- calendrier -->
-    <div id="calendrier" style="display: none;">
-        <!-- Contenu du calendrier -->
+        </nav>
+        <div id="calendar"></div>
+        <div id="product-cards"></div>
+        <button id="add-product-btn">Ajouter un produit</button>
+        <div id="product-popup" style="display: none;">
+            <form id="product-form">
+                <input type="date" id="product-date" placeholder="Date">
+                <input type="text" id="product-name" placeholder="Nom du produit">
+                <input type="number" id="product-price" placeholder="Prix">
+                <input type="number" id="product-quantity" placeholder="Quantité">
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>        
     </div>
-    <!-- fin calendrier -->
-
-    <!-- liste des courses -->
-    <div id="liste-courses" style="display: none;">
-        <!-- Contenu de la liste des courses -->
-    </div>
-    <!-- fin liste courses -->
-
-    <!-- popup ajout produit -->
-    <!-- popup modifier produit -->
-
-    <!-- Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyBS23iyYfGY4qAaIuCmLXIvzSXfsHWA_6U",
-          authDomain: "depense-25881.firebaseapp.com",
-          projectId: "depense-25881",
-          storageBucket: "depense-25881.appspot.com",
-          messagingSenderId: "17376246025",
-          appId: "1:17376246025:web:5489f7011f398a585cfbd8"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth();
-        const db = getFirestore(app);
-
-        // Affichage des formulaires
-        document.getElementById('show-login').addEventListener('click', () => {
-            document.getElementById('accueil').style.display = 'none';
-            document.getElementById('login-form').style.display = 'block';
-        });
-
-        document.getElementById('show-signup').addEventListener('click', () => {
-            document.getElementById('accueil').style.display = 'none';
-            document.getElementById('signup-form').style.display = 'block';
-        });
-
-        // Sign up
-        document.getElementById('signup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const fullName = document.getElementById('nom').value;
-            const phone = document.getElementById('telephone').value;
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                await setDoc(doc(db, 'users', user.uid), {
-                    fullName,
-                    phone,
-                    email
-                });
-
-                alert('Inscription réussie');
-                afficherApp();
-            } catch (error) {
-                console.error("Erreur lors de l'inscription :", error);
-                alert('Erreur lors de l\'inscription');
-            }
-        });
-
-        // Login
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                alert('Connexion réussie');
-                afficherApp();
-            } catch (error) {
-                console.error("Erreur lors de la connexion :", error);
-                alert('Erreur lors de la connexion');
-            }
-        });
-
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                alert('Déconnexion réussie');
-                afficherAccueil();
-            } catch (error) {
-                console.error("Erreur lors de la déconnexion :", error);
-                alert('Erreur lors de la déconnexion');
-            }
-        });
-
-        function afficherApp() {
-            document.getElementById('nav-bar').style.display = 'flex';
-            document.getElementById('calendrier').style.display = 'block';
-            document.getElementById('liste-courses').style.display = 'block';
-            document.getElementById('accueil').style.display = 'none';
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('signup-form').style.display = 'none';
-        }
-
-        function afficherAccueil() {
-            document.getElementById('nav-bar').style.display = 'none';
-            document.getElementById('calendrier').style.display = 'none';
-            document.getElementById('liste-courses').style.display = 'none';
-            document.getElementById('accueil').style.display = 'block';
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('signup-form').style.display = 'none';
-        }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/calendrier.js"></script>
+    <script src="js/produits.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
