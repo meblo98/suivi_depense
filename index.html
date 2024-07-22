@@ -19,10 +19,11 @@
 </head>
 <body>
     <div id="auth-container">
-        <div id="error-message" style="color: red;"></div>
+        
         <div id="success-message" style="color: green;"></div>
         <form id="login-form">
             <div class="container d-flex justify-content-center">
+                <div id="error-message" style="color: red;"></div>
                 <div class="row w-100">
                     <div class="col-md-6 d-flex flex-column justify-content-between">
                         <div class="card mt-5 p-5">
@@ -39,14 +40,14 @@
                     <div class="col-md-6  d-flex flex-column justify-content-between">
                         <div class="card two w-100px mt-5 p-5 bg-white px-5 py-4 mb-3">
                             <div class="form-group">
-                                <input type="email" class="form-control" id="login-email" required>
+                                <input type="email" class="form-control" id="login-email" >
                                 <label class="form-control-placeholder" for="mail">Email</label>
-                                <div id="login-email-error" class="error-message"></div>
+                                <div id="login-email-error" class="error-message" style="color: red;"></div>
                             </div>
                             <div class="form-group">
-                                <input type="password" class="form-control" id="login-password" required>
+                                <input type="password" class="form-control" id="login-password" >
                                 <label class="form-control-placeholder" for="password">Mot de passe</label>
-                                <div id="login-password-error" class="error-message"></div>
+                                <div id="login-password-error" class="error-message" style="color: red;"></div>
                             </div>
                             <button class="btn btn-block btn-lg mt-1 mb-2" style="background-color: #68902b;">
                                 <span>Démarrer<i class="fas fa-long-arrow-alt-right ml-2"></i></span>

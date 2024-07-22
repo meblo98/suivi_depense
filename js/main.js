@@ -1,14 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialiser l'application
     initApp();
-
-    // Initialiser les événements de formulaire de connexion et d'inscription
     initAuthForms();
-
-    // Initialiser le calendrier
     initCalendar();
-
-    // Initialiser les produits
     initProducts();
 });
 
@@ -16,263 +9,7 @@ const initApp = () => {
     console.log('Application initialisée');
 };
 
-const initCalendar = () => {
-    const calendarContainer = document.getElementById('calendar');
-    flatpickr(calendarContainer, {
-        inline: true,
-        onChange: (selectedDates, dateStr, instance) => {
-            loadProducts(dateStr);
-        }
-    });
-    
-
-    document.getElementById('show-signup').addEventListener('click', () => {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('signup-form').style.display = 'block';
-    });
-    
-    document.getElementById('show-login').addEventListener('click', () => {
-        document.getElementById('signup-form').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-    });
-    
-    const displayFieldError = (fieldId, message) => {
-        const errorContainer = document.getElementById(`${fieldId}-error`);
-        errorContainer.innerText = message;
-        errorContainer.style.display = 'block';
-    };
-    
-    const hideFieldError = (fieldId) => {
-        const errorContainer = document.getElementById(`${fieldId}-error`);
-        errorContainer.style.display = 'none';
-    };
-    
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        
-        hideFieldError('login-email');
-        hideFieldError('login-password');
-        
-        auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                document.getElementById('auth-container').style.display = 'none';
-                document.getElementById('main-container').style.display = 'block';
-                const user = userCredential.user;
-                db.collection('users').doc(user.uid).get().then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        document.getElementById('user-name').innerText = `${userData.prenom} ${userData.nom}`;
-                    }
-                });
-                const today = new Date().toISOString().split('T')[0];
-                loadProducts(today);
-            })
-            .catch((error) => {
-                if (error.code.includes('email')) {
-                    displayFieldError('login-email', 'Email incorrect');
-                } else if (error.code.includes('password')) {
-                    displayFieldError('login-password', 'Mot de passe incorrect');
-                } else {
-                    displayError('Erreur lors de la connexion : ' + error.message);
-                }
-            });
-    });
-    
-    
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-    
-        auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                document.getElementById('auth-container').style.display = 'none';
-                document.getElementById('main-container').style.display = 'block';
-                const user = userCredential.user;
-                db.collection('users').doc(user.uid).get().then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        document.getElementById('user-name').innerText = `${userData.prenom} ${userData.nom}`;
-                    }
-                });
-                const today = new Date().toISOString().split('T')[0];
-                loadProducts(today); // Charger les produits pour la date actuelle
-            })
-            .catch((error) => {
-                displayError('Erreur lors de la connexion : ' + error.message);
-            });
-    });
-    
-    document.getElementById('logout').addEventListener('click', () => {
-        auth.signOut().then(() => {
-            document.getElementById('main-container').style.display = 'none';
-            document.getElementById('auth-container').style.display = 'block';
-            displayMessage('Déconnexion réussie.');
-        }).catch((error) => {
-            displayError('Erreur lors de la déconnexion : ' + error.message);
-        });
-    });
-    
-    const loadProducts = (selectedDate = null) => {
-        const user = firebase.auth().currentUser;
-        if (user) {
-          let query = db.collection('products').where('uid', '==', user.uid);
-      
-          if (selectedDate) {
-            const startOfDay = new Date(selectedDate);
-            startOfDay.setHours(0, 0, 0, 0); // Début de la journée
-            const endOfDay = new Date(selectedDate);
-            endOfDay.setHours(23, 59, 59, 999); // Fin de la journée
-      
-            query = query.where('date', '>=', startOfDay).where('date', '<=', endOfDay);
-          }
-      
-          query.get().then((querySnapshot) => {
-            const productCards = document.getElementById('product-cards');
-            productCards.innerHTML = '';
-            querySnapshot.forEach((doc) => {
-              const product = doc.data();
-              const card = document.createElement('div');
-              card.className = 'card card-1';
-              card.innerHTML = `
-                <h2 class="card__title">${product.name}</h2>
-                <p>Prix: ${product.price} FCFA</p>
-                <p>Quantité: ${product.quantity}</p>
-                <p>Total: ${product.price * product.quantity} FCFA</p>
-                <div class="card__actions">
-                  <i class="fas fa-edit edit-product" data-product-id="${doc.id}"></i>
-                  <i class="fas fa-trash delete-product" data-product-id="${doc.id}"></i>
-                  <input type="checkbox" class="product-checkbox">
-                </div>
-              `;
-              productCards.appendChild(card);
-              card.style.marginBottom = '20px';
-      
-              // Ajouter les événements pour les icônes
-              const editIcon = card.querySelector('.edit-product');
-              const deleteIcon = card.querySelector('.delete-product');
-              const checkbox = card.querySelector('.product-checkbox');
-      
-              editIcon.addEventListener('click', () => {
-                const productId = editIcon.getAttribute('data-product-id');
-                const productNameInput = document.createElement('input');
-                productNameInput.type = 'text';
-                productNameInput.value = product.name;
-                const productPriceInput = document.createElement('input');
-                productPriceInput.type = 'number';
-                productPriceInput.value = product.price;
-                const productQuantityInput = document.createElement('input');
-                productQuantityInput.type = 'number';
-                productQuantityInput.value = product.quantity;
-      
-                const saveButton = document.createElement('button');
-                saveButton.textContent = 'Enregistrer';
-                saveButton.addEventListener('click', () => {
-                  const updatedProduct = {
-                    name: productNameInput.value,
-                    price: parseFloat(productPriceInput.value),
-                    quantity: parseFloat(productQuantityInput.value)
-                  };
-                  db.collection('products').doc(productId).update(updatedProduct)
-                    .then(() => {
-                      console.log('Produit mis à jour avec succès');
-                      loadProducts(selectedDate); editIcon.style.display = 'none';
-                      deleteIcon.style.display = 'none';
-                    })
-                    .catch((error) => {
-                      console.error('Erreur lors de la mise à jour du produit', error);
-                    });
-                });
-      
-                card.innerHTML = '';
-                card.appendChild(productNameInput);
-                card.appendChild(productPriceInput);
-                card.appendChild(productQuantityInput);
-                card.appendChild(saveButton);
-              });
-      
-              deleteIcon.addEventListener('click', () => {
-                const productId = deleteIcon.getAttribute('data-product-id');
-                db.collection('products').doc(productId).delete()
-                  .then(() => {
-                    console.log('Produit supprimé avec succès');
-                    loadProducts(selectedDate);
-                  })
-                  .catch((error) => {
-                    console.error('Erreur lors de la suppression du produit', error);
-                  });
-              });
-      
-              checkbox.addEventListener('change', () => {
-                if (checkbox.checked) {
-                    editIcon.style.display = 'none';
-                    deleteIcon.style.display = 'none';
-                  card.style.textDecoration = 'line-through';
-                } else {
-                    editIcon.style.display = 'inline';
-                    deleteIcon.style.display = 'inline';
-                }
-              });
-            });
-          }).catch((error) => {
-            console.error('Erreur lors du chargement des produits', error);
-          });
-        } else {
-          console.error('Utilisateur non authentifié');
-        }
-      };
-      
-    const displayError = (message) => {
-        const errorContainer = document.getElementById('error-container');
-        errorContainer.innerText = message;
-        errorContainer.style.display = 'block';
-    };
-    
-    const displayMessage = (message) => {
-        const messageContainer = document.getElementById('message-container');
-        messageContainer.innerText = message;
-        messageContainer.style.display = 'block';
-    };
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        initProducts();
-    });
-    
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        initProducts();
-    });
-    
-};
-
-const displayMessage = (message) => {
-    const messageContainer = document.getElementById('message-container');
-    const messageElement = document.createElement('div');
-    messageElement.className = 'alert alert-success';
-    messageElement.textContent = message;
-    messageContainer.appendChild(messageElement);
-  
-    setTimeout(() => {
-      messageElement.remove();
-    }, 3000);
-  };
-  
-  const displayError = (errorMessage) => {
-    const messageContainer = document.getElementById('message-container');
-    const errorElement = document.createElement('div');
-    errorElement.className = 'alert alert-danger';
-    errorElement.textContent = errorMessage;
-    messageContainer.appendChild(errorElement);
-  
-    setTimeout(() => {
-      errorElement.remove();
-    }, 3000);
-  };
-  
 const initAuthForms = () => {
-    // Les événements de formulaire de connexion et d'inscription
     document.getElementById('show-signup').addEventListener('click', () => {
         document.getElementById('login-form').style.display = 'none';
         document.getElementById('signup-form').style.display = 'block';
@@ -291,6 +28,11 @@ const initAuthForms = () => {
         const email = document.getElementById('signup-email').value;
         const password = document.getElementById('signup-password').value;
 
+        if (!prenom || !nom || !telephone || !email || !password) {
+            displayError('Tous les champs sont obligatoires', 'signup');
+            return;
+        }
+
         auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
@@ -305,9 +47,11 @@ const initAuthForms = () => {
                 document.getElementById('signup-form').reset();
                 document.getElementById('signup-form').style.display = 'none';
                 document.getElementById('login-form').style.display = 'block';
+                displayMessage('Inscription réussie. Veuillez vous connecter.');
             })
             .catch((error) => {
                 console.error('Erreur lors de l\'inscription', error);
+                displayError(error.message, 'signup');
             });
     });
 
@@ -315,6 +59,11 @@ const initAuthForms = () => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
+
+        if (!email || !password) {
+            displayError('Tous les champs sont obligatoires', 'login');
+            return;
+        }
 
         auth.signInWithEmailAndPassword(email, password)
             .then((userCredential) => {
@@ -330,6 +79,7 @@ const initAuthForms = () => {
             })
             .catch((error) => {
                 console.error('Erreur lors de la connexion', error);
+                displayError('Email ou mot de passe incorrect', 'login');
             });
     });
 
@@ -337,8 +87,178 @@ const initAuthForms = () => {
         auth.signOut().then(() => {
             document.getElementById('main-container').style.display = 'none';
             document.getElementById('auth-container').style.display = 'block';
+            displayMessage('Déconnexion réussie.');
         }).catch((error) => {
             console.error('Erreur lors de la déconnexion', error);
+            displayError('Erreur lors de la déconnexion : ' + error.message);
         });
+    });
+};
+
+const displayError = (message, formType = '') => {
+    let errorContainer;
+    if (formType === 'login') {
+        errorContainer = document.getElementById('error-message');
+    } else if (formType === 'signup') {
+        errorContainer = document.getElementById('error-message');
+    } else {
+        errorContainer = document.getElementById('error-container');
+    }
+    errorContainer.innerText = message;
+    errorContainer.style.display = 'block';
+
+    setTimeout(() => {
+        errorContainer.style.display = 'none';
+    }, 3000);
+};
+
+const displayMessage = (message) => {
+    const messageContainer = document.getElementById('success-message');
+    messageContainer.innerText = message;
+    messageContainer.style.display = 'block';
+
+    setTimeout(() => {
+        messageContainer.style.display = 'none';
+    }, 3000);
+};
+
+// Init Calendar and Products functions
+const initCalendar = () => {
+    const calendarContainer = document.getElementById('calendar');
+    flatpickr(calendarContainer, {
+        inline: true,
+        onChange: (selectedDates, dateStr, instance) => {
+            loadProducts(dateStr);
+        }
+    });
+};
+
+const initProducts = () => {
+    document.getElementById('add-product-btn').addEventListener('click', () => {
+        document.getElementById('product-popup').style.display = 'block';
+    });
+
+    document.getElementById('product-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('product-name').value;
+        const price = document.getElementById('product-price').value;
+        const date = document.getElementById('product-date').value;
+        const quantity = document.getElementById('product-quantity').value;
+
+        if (!name || !price || !date || !quantity) {
+            displayError('Tous les champs sont obligatoires');
+            return;
+        }
+
+        const user = firebase.auth().currentUser;
+        if (user) {
+            const newProduct = {
+                name: name,
+                price: parseFloat(price),
+                date: new Date(date),
+                quantity: parseFloat(quantity),
+                uid: user.uid
+            };
+
+            db.collection('products').add(newProduct)
+                .then(() => {
+                    document.getElementById('product-popup').style.display = 'none';
+                    loadProducts(date);
+                    displayMessage('Produit ajouté avec succès.');
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de l\'ajout du produit', error);
+                    displayError('Erreur lors de l\'ajout du produit : ' + error.message);
+                });
+        } else {
+            console.error('Utilisateur non authentifié');
+        }
+    });
+};
+
+const loadProducts = (selectedDate = null) => {
+    const user = firebase.auth().currentUser;
+    if (user) {
+        let query = db.collection('products').where('uid', '==', user.uid);
+
+        if (selectedDate) {
+            const startOfDay = new Date(selectedDate);
+            startOfDay.setHours(0, 0, 0, 0); // Début de la journée
+            const endOfDay = new Date(selectedDate);
+            endOfDay.setHours(23, 59, 59, 999); // Fin de la journée
+
+            query = query.where('date', '>=', startOfDay).where('date', '<=', endOfDay);
+        }
+
+        query.get().then((querySnapshot) => {
+            const productCards = document.getElementById('product-cards');
+            productCards.innerHTML = '';
+            querySnapshot.forEach((doc) => {
+                const product = doc.data();
+                const card = document.createElement('div');
+                card.className = 'card card-1';
+                card.innerHTML = `
+                    <p>${product.name}</p>
+                    <p>Prix: ${product.price} FCFA</p>
+                    <p>Quantité: ${product.quantity}</p>
+                    <p>Total: ${product.price * product.quantity} FCFA</p>
+                    <div class="card__actions">
+                        <i class="fas fa-edit edit-product" data-product-id="${doc.id}"></i>
+                        <i class="fas fa-trash delete-product" data-product-id="${doc.id}"></i>
+                        <input type="checkbox" class="product-checkbox">
+                    </div>
+                `;
+                productCards.appendChild(card);
+                card.style.marginBottom = '20px';
+
+                // Ajouter les événements pour les icônes
+                const editIcon = card.querySelector('.edit-product');
+                editIcon.addEventListener('click', () => {
+                    editProduct(doc.id);
+                });
+
+                const deleteIcon = card.querySelector('.delete-product');
+                deleteIcon.addEventListener('click', () => {
+                    deleteProduct(doc.id);
+                });
+
+                const checkbox = card.querySelector('.product-checkbox');
+                checkbox.addEventListener('change', (event) => {
+                    if (event.target.checked) {
+                        card.classList.add('completed');
+                    } else {
+                        card.classList.remove('completed');
+                    }
+                });
+            });
+        });
+    }
+};
+
+const editProduct = (productId) => {
+    // Récupérer les informations du produit à éditer et les afficher dans le formulaire
+    db.collection('products').doc(productId).get().then((doc) => {
+        if (doc.exists) {
+            const product = doc.data();
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-date').value = new Date(product.date).toISOString().slice(0, 10);
+            document.getElementById('product-quantity').value = product.quantity;
+            document.getElementById('product-id').value = productId;
+            document.getElementById('product-popup').style.display = 'block';
+        }
+    }).catch((error) => {
+        console.error('Erreur lors de la récupération du produit', error);
+        displayError('Erreur lors de la récupération du produit : ' + error.message);
+    });
+};
+
+const deleteProduct = (productId) => {
+    db.collection('products').doc(productId).delete().then(() => {
+        displayMessage('Produit supprimé avec succès.');
+        loadProducts();
+    }).catch((error) => {
+        console.error('Erreur lors de la suppression du produit', error);
+        displayError('Erreur lors de la suppression du produit : ' + error.message);
     });
 };

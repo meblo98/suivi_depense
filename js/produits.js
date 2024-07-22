@@ -99,6 +99,7 @@ const loadProducts = (selectedDate = null) => {
   
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Enregistrer';
+            saveButton.style.backgroundColor = '#68902b';
             saveButton.addEventListener('click', () => {
               const updatedProduct = {
                 name: productNameInput.value,
@@ -142,6 +143,7 @@ const loadProducts = (selectedDate = null) => {
             }  else {
                 editIcon.style.display = 'inline';
                 deleteIcon.style.display = 'inline';
+                card.style.textDecoration = 'none';
             }
           });
         });
