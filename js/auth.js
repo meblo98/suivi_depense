@@ -17,24 +17,26 @@ document.getElementById('signup-form').addEventListener('submit', (e) => {
     const password = document.getElementById('signup-password').value;
 
     auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        const user = userCredential.user;
-        return db.collection('users').doc(user.uid).set({
-            prenom: prenom,
-            nom: nom,
-            telephone: telephone,
-            email: email
+        .then((userCredential) => {
+            const user = userCredential.user;
+            return db.collection('users').doc(user.uid).set({
+                prenom: prenom,
+                nom: nom,
+                telephone: telephone,
+                email: email
+            });
+        })
+        .then(() => {
+            document.getElementById('success-message').innerText = "Inscription réussie. Veuillez vous connecter.";
+            document.getElementById('error-message').innerText = "";
+            document.getElementById('signup-form').reset();
+            document.getElementById('signup-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+        })
+        .catch((error) => {
+            document.getElementById('error-message').innerText = error.message;
+            document.getElementById('success-message').innerText = "";
         });
-    })
-    .then(() => {
-        document.getElementById('signup-form').reset();
-        document.getElementById('signup-form').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-    })
-    .catch((error) => {
-        console.error('Erreur lors de l\'inscription ou de l\'ajout dans Firestore:', error.message);
-    });
-
 });
 
 document.getElementById('login-form').addEventListener('submit', (e) => {
@@ -44,6 +46,7 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
 
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
+            localStorage.setItem('isLoggedIn', 'true');
             document.getElementById('auth-container').style.display = 'none';
             document.getElementById('main-container').style.display = 'block';
             const user = userCredential.user;
@@ -55,15 +58,39 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
             });
         })
         .catch((error) => {
-            console.error('Erreur lors de la connexion', error);
+            document.getElementById('error-message').innerText = error.message;
+            document.getElementById('success-message').innerText = "";
         });
 });
 
 document.getElementById('logout').addEventListener('click', () => {
     auth.signOut().then(() => {
+        localStorage.removeItem('isLoggedIn');
         document.getElementById('main-container').style.display = 'none';
         document.getElementById('auth-container').style.display = 'block';
     }).catch((error) => {
-        console.error('Erreur lors de la déconnexion', error);
+        document.getElementById('error-message').innerText = error.message;
+        document.getElementById('success-message').innerText = "";
     });
+});
+
+window.addEventListener('load', function() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    
+    if (isLoggedIn === 'true') {
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('main-container').style.display = 'block';
+        const user = auth.currentUser;
+        if (user) {
+            db.collection('users').doc(user.uid).get().then((doc) => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    document.getElementById('user-name').innerText = `${userData.prenom} ${userData.nom}`;
+                }
+            });
+        }
+    } else {
+        document.getElementById('auth-container').style.display = 'block';
+        document.getElementById('main-container').style.display = 'none';
+    }
 });

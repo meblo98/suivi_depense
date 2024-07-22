@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application de Suivi de Budget</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -17,31 +19,50 @@
 </head>
 <body>
     <div id="auth-container">
+        <div id="error-message" style="color: red;"></div>
+        <div id="success-message" style="color: green;"></div>
         <form id="login-form">
             <div class="container d-flex justify-content-center">
-                <div class="d-flex flex-column justify-content-between">
-                    <div class="card mt-3 p-5">
-                        <div class="logo mb-3 w-100"><img style="width: 30%;" src="logo/logo.png"></div>
+                <div class="row w-100">
+                    <div class="col-md-6 d-flex flex-column justify-content-between">
+                        <div class="card mt-5 p-5">
+                            <div class="logo mb-3 w-100"><img style="width: 30%;" src="logo/logo.png"></div>
                             <div>
                                 <p class="mb-1" style="color: #81a969;">Commencez à gérer vos</p>
                                 <h4 class="mb-5 text-green">courses avec nous!</h4>
                             </div>
-                            <button class="btn btn-lg" id="show-signup" style="background-color: #68902b;"><small>Pas de compte ?</small><span>&nbsp;S'inscrire</span>
+                            <button class="btn btn-lg" id="show-signup" style="background-color: #68902b;">
+                                <small>Pas de compte ?</small><span>&nbsp;S'inscrire</span>
                             </button>
+                        </div>
                     </div>
-                    <div class="card two bg-white px-5 py-4 mb-3">
-                        <div class="form-group"><input type="email" class="form-control"id="login-email" required><label class="form-control-placeholder" for="mail">Email</label></div>
-                        <div class="form-group"><input type="password" class="form-control" id="login-password" required><label class="form-control-placeholder" for="password">Mot de passe</label></div>
-                        <button class="btn btn-block btn-lg mt-1 mb-2" style="background-color: #68902b;"><span>Démarrer<i class="fas fa-long-arrow-alt-right ml-2"></i></span></button>
+                    <div class="col-md-6  d-flex flex-column justify-content-between">
+                        <div class="card two w-100px mt-5 p-5 bg-white px-5 py-4 mb-3">
+                            <div class="form-group">
+                                <input type="email" class="form-control" id="login-email" required>
+                                <label class="form-control-placeholder" for="mail">Email</label>
+                                <div id="login-email-error" class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="login-password" required>
+                                <label class="form-control-placeholder" for="password">Mot de passe</label>
+                                <div id="login-password-error" class="error-message"></div>
+                            </div>
+                            <button class="btn btn-block btn-lg mt-1 mb-2" style="background-color: #68902b;">
+                                <span>Démarrer<i class="fas fa-long-arrow-alt-right ml-2"></i></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+         
             
         </form>
         <form id="signup-form" style="display: none;">
             <div class="container d-flex justify-content-center">
-                <div class="d-flex flex-column justify-content-between">
-                    <div class="card mt-3 p-5">
+                <div class="row w-100">
+                <div class="col-md-6 d-flex flex-column justify-content-between">
+                    <div class="card mt-5 p-5">
                         <div class="logo mb-3 w-100"><img style="width: 30%;" src="logo/logo.png"></div>
                             <div>
                                 <p class="mb-1" style="color: #81a969;">Commencez à gérer vos</p>
@@ -50,7 +71,9 @@
                             <button class="btn btn-lg" id="show-login" style="background-color: #68902b;"><small>Déjà inscrit ?</small><span>&nbsp;Se connecter</span>
                             </button>
                     </div>
-                    <div class="card two bg-white px-5 py-4 mb-3">
+                </div>
+                <div class="col-md-6  d-flex flex-column justify-content-between">
+                    <div class="card two w-100px mt-5 p-5 bg-white px-5 py-4 mb-3">
                         <div class="form-group"><input type="text" class="form-control" id="signup-prenom" required><label class="form-control-placeholder" for="mail">Prénom</label></div>
                         <div class="form-group"><input type="text" class="form-control" id="signup-nom" required><label class="form-control-placeholder" for="mail">Nom</label></div>
                         <div class="form-group"><input type="tel" class="form-control" id="signup-telephone" required><label class="form-control-placeholder" for="mail">Téléphone</label></div>
@@ -60,7 +83,7 @@
                     </div>
                 </div>
             </div>
-       
+        </div>
         </form>
     </div>
     <div id="main-container" style="display: none;">
@@ -73,18 +96,27 @@
                 </div>
             </div>
         </nav>
+        
         <div id="calendar"></div>
-        <div id="product-cards"></div>
-        <button id="add-product-btn">Ajouter un produit</button>
-        <div id="product-popup" style="display: none;">
+        <button id="add-product-btn"><i class="fa-solid fa-plus" style="color: #000000;"></i></button>
+        <div id="product-cards" class="cards">
+            <div id="error-container" style="display: none; color: red;"></div>
+        </div>
+        
+        <div id="product-popup" style="display:none;">
             <form id="product-form">
-                <input type="date" id="product-date" placeholder="Date">
-                <input type="text" id="product-name" placeholder="Nom du produit">
-                <input type="number" id="product-price" placeholder="Prix">
-                <input type="number" id="product-quantity" placeholder="Quantité">
-                <button type="submit">Ajouter</button>
+                <input type="text" id="product-name" placeholder="Nom du produit" required>
+                <input type="number" id="product-price" placeholder="Prix du produit" required>
+                <input type="date" id="product-date" required>
+                <input type="number" id="product-quantity" placeholder="Quantité" required>
+                <button style="background-color: #68902b;" type="submit">Ajouter</button>
             </form>
-        </div>        
+        </div>
+
+        
+        <div id="error-container" style="display:none;color:red;"></div>
+        <div id="message-container" style="display:none;color:green;"></div>
+    </div>       
     </div>
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
