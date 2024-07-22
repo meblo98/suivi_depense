@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     editIcon.style.display = 'inline';
                     deleteIcon.style.display = 'inline';
+                    card.style.textDecoration = 'none';
                 }
               });
             });
